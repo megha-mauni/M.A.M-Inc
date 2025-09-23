@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M.A.M.Inc - Magnetic Component Solutions</title>
+    <style>
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+          font-family: sans-serif;
+        }
+
+        body {
+          font-family: sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+        .App {
+          min-height: 100vh;
+          font-family: sans-serif;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .header {
+          background-color: #dde6cb;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          z-index: 1000;
+        }
+
+        .nav {
+          display: flex;
+          align-items: center;
+          max-width: 1600px;
+          margin: 0 auto;
+          padding: 1rem 1rem;
+        }
+
+        .nav-left {
+          display: flex;
+          align-items: center;
+          margin-right: 35rem;
+        }
+
+        .nav-left a {
+          display: flex;
+          align-items: center;
+          text-decoration: none;
+        }
+
+        .nav-right {
+          display: flex;
+          align-items: center;
+          gap: 2rem;
+          margin-left: 7rem;
+        }
+
+        .nav-item {
+          text-decoration: none;
+          color: #2098D1;
+          font-weight: 700;
+          font-size: 1.3rem;
+          transition: color 0.3s ease;
+          font-family: sans-serif;
+          position: relative;
+          min-width: 100px;
+          text-align: center;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 40px;
+        }
+
+        .nav-item::after {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 50%;
+          width: 0;
+          height: 2px;
+          background-color: #2098D1;
+          transition: all 0.3s ease;
+          transform: translateX(-50%);
+        }
+
+        .nav-item:hover::after {
+          width: 80%;
+        }
+
+        .nav-item:hover {
+          color: #1a7db8;
+        }
+
+        .dropdown {
+          position: relative;
+          display: inline-block;
+        }
+
+        .dropdown-toggle {
+          cursor: pointer;
+          user-select: none;
+          color: #2098D1 !important;
+          text-decoration: none;
+          font-weight: 600;
+          font-size: 1.3rem;
+          transition: color 0.3s ease;
+          font-family: sans-serif;
+          position: relative;
+          min-width: 100px;
+          text-align: center;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 40px;
+        }
+
+        .dropdown-toggle::after {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 50%;
+          width: 0;
+          height: 2px;
+          background-color: #2098D1;
+          transition: all 0.3s ease;
+          transform: translateX(-50%);
+        }
+
+        .dropdown:hover .dropdown-toggle::after {
+          width: 80%;
+        }
+
+        .dropdown:hover .dropdown-toggle {
+          color: #1a7db8;
+        }
+
+        .dropdown-menu {
+          position: absolute;
+          top: 100%;
+          left: 0;
+          background-color: white;
+          min-width: 160px;
+          box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+          border-radius: 4px;
+          z-index: 1001;
+          margin-top: 5px;
+          display: none;
+        }
+
+        .dropdown-menu.show {
+          display: block;
+        }
+
+        .dropdown-menu a {
+          color: #000000;
+          padding: 12px 16px;
+          text-decoration: none;
+          display: block;
+          font-weight: 200;
+          border-bottom: 1px solid #f1f1f1;
+          font-family: sans-serif;
+        }
+
+        .dropdown-menu a:hover {
+          background-color: #f8f9fa;
+          color: #1a7db8;
+        }
+
+        .dropdown-menu a:last-child {
+          border-bottom: none;
+        }
+
+        .logo {
+          height: 50px;
+          width: auto;
+          object-fit: contain;
+          cursor: pointer;
+          transition: transform 0.1s ease;
+        }
+
+        .logo:hover {
+          transform: scale(1.05);
+        }
+
+        /* Hero Content Section with Background Image */
+        .hero-content-section {
+          margin-top: 120px;
+          height: 400px;
+          background-image: url('images/circuits.jpg');
+          background-size: cover;
+          background-position: center;
+          background-repeat: no-repeat;
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .hero-overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0, 0, 0, 0.5);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .hero-content {
+          max-width: 1000px;
+          padding: 0 2rem;
+          text-align: center;
+        }
+
+        .hero-content p {
+          font-size: 1.7rem;
+          line-height: 1.8;
+          color: white;
+          font-family: sans-serif;
+          font-weight: 600;
+          text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        }
+
+        /* Business Objectives Section */
+        .business-objectives-section {
+          padding: 4rem 0;
+          background-color: #ffffff;
+          position: relative;
+        }
+
+        .objectives-container {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 0 2rem;
+          text-align: center;
+        }
+
+        .objectives-container h2 {
+          font-size: 2.5rem;
+          color: #333;
+          margin-bottom: 3rem;
+          font-family: sans-serif;
+        }
+
+        .objectives-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 3rem;
+          margin-top: 2rem;
+        }
+
+        .objective-item {
+          padding: 2rem;
+          border-radius: 12px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+          transition: all 0.6s ease;
+          transform: translateY(30px);
+          opacity: 0;
+          text-align: center;
+        }
+
+        .objective-item.visible {
+          transform: translateY(0);
+          opacity: 1;
+        }
+
+        .objective-item:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .objective-icon {
+          width: 80px;
+          height: 80px;
+          background-color: #2098D1;
+          border-radius: 50%;
+          margin: 0 auto 1.5rem auto;
+          box-shadow: 0 4px 8px rgba(32, 152, 209, 0.3);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding: 15px;
+        }
+
+        .objective-icon img {
+          width: 50px;
+          height: 50px;
+          object-fit: contain;
+          filter: brightness(0) invert(1); /* Makes icons white */
+        }
+
+        .objective-item h3 {
+          font-size: 1.5rem;
+          color: #333;
+          margin-bottom: 1rem;
+          font-family: sans-serif;
+          font-weight: 600;
+        }
+
+        .objective-item p {
+          font-size: 1.1rem;
+          line-height: 1.6;
+          color: #666;
+          font-family: sans-serif;
+        }
+
+        /* Image Carousel Section */
+        .image-carousel-section {
+          padding: 4rem 0;
+        }
+
+        .carousel-container-split {
+          max-width: 1200px;
+          margin: 0 auto;
+          position: relative;
+          padding: 0 2rem;
+        }
+
+        .carousel-content-wrapper {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 3rem;
+          align-items: center;
+          min-height: 400px;
+        }
+
+        .carousel-image-container {
+          width: 100%;
+          height: 400px;
+          overflow: hidden;
+          border-radius: 12px;
+          box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+
+        .carousel-image-split {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          transition: transform 0.5s ease;
+        }
+
+        .carousel-text-container {
+          padding: 2rem;
+        }
+
+        .carousel-text-container h3 {
+          font-size: 2.2rem;
+          color: #333;
+          margin-bottom: 1.5rem;
+          font-family: sans-serif;
+          font-weight: 600;
+        }
+
+        .carousel-text-container p {
+          font-size: 1.3rem;
+          line-height: 1.6;
+          color: #666;
+          font-family: sans-serif;
+        }
+
+        .carousel-btn {
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          background-color: rgba(0, 0, 0, 0.5);
+          color: white;
+          border: none;
+          width: 50px;
+          height: 50px;
+          border-radius: 50%;
+          font-size: 24px;
+          cursor: pointer;
+          transition: background-color 0.3s ease;
+          z-index: 100;
+        }
+
+        .carousel-btn:hover {
+          background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        .prev-btn {
+          left: 10px;
+        }
+
+        .next-btn {
+          right: 10px;
+        }
+
+        .carousel-dots {
+          display: flex;
+          justify-content: center;
+          gap: 10px;
+          margin-top: 2rem;
+        }
+
+        .dot {
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+          border: none;
+          background-color: #ccc;
+          cursor: pointer;
+          transition: background-color 0.3s ease;
+        }
+
+        .dot.active {
+          background-color: #2098D1;
+        }
+
+        .footer {
+          background-color: #f8f9fa;
+          border-top: 1px solid #e0e0e0;
+          margin-top: auto;
+        }
+
+        .footer-content {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 2rem;
+          text-align: center;
+        }
+
+        .footer-content p {
+          font-family: sans-serif;
+          color: #666;
+          font-size: 0.9rem;
+        }
+
+        .back-to-top {
+          position: fixed;
+          bottom: 30px;
+          right: 30px;
+          background-color: #37a2d3;
+          color: white;
+          border: none;
+          border-radius: 50%;
+          width: 50px;
+          height: 50px;
+          font-size: 20px;
+          cursor: pointer;
+          box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+          transition: background-color 0.3s ease, transform 0.3s ease;
+          z-index: 1000;
+          font-family: sans-serif;
+          display: none;
+        }
+
+        .back-to-top:hover {
+          background-color: #1a7db8;
+          transform: translateY(-2px);
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+          .nav {
+            padding: 1rem;
+            gap: 1rem;
+          }
+          
+          .nav-left {
+            margin-right: 2rem;
+          }
+          
+          .nav-right {
+            gap: 1rem;
+            margin-left: 0;
+          }
+          
+          .nav-item {
+            font-size: 1rem;
+            min-width: 80px;
+          }
+          
+          .dropdown-toggle {
+            font-size: 1rem;
+            min-width: 80px;
+          }
+          
+          .logo {
+            height: 70px;
+          }
+          
+          .hero-content-section {
+            margin-top: 100px;
+            height: 300px;
+          }
+          
+          .hero-content p {
+            font-size: 1.5rem;
+          }
+
+          .objectives-container h2 {
+            font-size: 2rem;
+          }
+
+          .objectives-grid {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+          }
+
+          .objective-icon {
+            width: 70px;
+            height: 70px;
+          }
+
+          .objective-item h3 {
+            font-size: 1.3rem;
+          }
+
+          .objective-item p {
+            font-size: 1rem;
+          }
+
+          .carousel-content-wrapper {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+          }
+          
+          .carousel-image-container {
+            height: 250px;
+          }
+          
+          .carousel-text-container h3 {
+            font-size: 1.8rem;
+          }
+          
+          .carousel-text-container p {
+            font-size: 1.1rem;
+          }
+          
+          .carousel-btn {
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+          }
+          
+          .prev-btn {
+            left: 20px;
+          }
+          
+          .next-btn {
+            right: 20px;
+          }
+          
+          .dropdown-menu {
+            min-width: 140px;
+          }
+          
+          .back-to-top {
+            bottom: 20px;
+            right: 20px;
+            width: 45px;
+            height: 45px;
+            font-size: 18px;
+          }
+        }
+    </style>
+</head>
+<body>
+    <div class="App">
+        <header class="header">
+            <nav class="nav">
+                <div class="nav-left">
+                    <a href="#home" id="home-link">
+                        <img src="images/logo.jpg" alt="M.A.M.Inc Logo" class="logo" />
+                    </a>
+                </div>
+                <div class="nav-right">
+                    <a href="#about" class="nav-item">About</a>
+                    
+                    <div class="dropdown nav-item" id="products-dropdown">
+                        <a href="#products" class="dropdown-toggle">
+                            Products ▼
+                        </a>
+                        <div class="dropdown-menu" id="dropdown-menu">
+                            <a href="#transformers">Transformers</a>
+                            <a href="#chokers">Chokers</a>
+                            <a href="#filters">Filters</a>
+                            <a href="#abc">ABC</a>
+                        </div>
+                    </div>
+
+                    <a href="#sbir-doe" class="nav-item">Project</a>
+                    <a href="#contact" class="nav-item">Contact Us</a>
+                </div>
+            </nav>
+        </header>
+
+        <!-- Content Section with Background Image -->
+        <section class="hero-content-section">
+            <div class="hero-overlay">
+                <div class="hero-content">
+                    <p>
+                        M.A.M Inc. creates innovative power electronic solutions to satisfy the unique needs of electronic design.
+                        Do you have enough on your mind?
+                        Let us help you with the design and development of magnetics.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Business Objectives Section -->
+        <section class="business-objectives-section">
+            <div class="objectives-container">
+                <h2>Business Objectives</h2>
+                <div class="objectives-grid">
+                    <div class="objective-item">
+                        <div class="objective-icon">
+                            <img src="images/team-icon.png" alt="Extension Team" />  
+                        </div>
+                        <h3></h3>
+                        <p>Operate as an extension to our client's magnetic component design team</p>
+                    </div>
+                    <div class="objective-item">
+                        <div class="objective-icon">
+                            <img src="images/frequency-icon.png" alt="High-Frequency Focus" />  
+                        </div>
+                        <h3></h3>
+                        <p>Focus on challenging opportunities in high-frequency power magnetic markets</p>
+                    </div>
+                    <div class="objective-item">
+                        <div class="objective-icon">
+                            <img src="images/market-icon.png" alt="Market Exploration" />  
+                        </div>
+                        <h3></h3>
+                        <p>Explore magnetic component opportunities in renewable energy, locomotive, and industrial markets</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Image Carousel Section -->
+        <section class="image-carousel-section">
+            <div class="carousel-container-split">
+                <div class="carousel-content-wrapper">
+                    <div class="carousel-image-container">
+                        <img 
+                            src="images/windmill.jpg" 
+                            alt="Renewable Energy"
+                            class="carousel-image-split"
+                            id="carousel-image"
+                        />
+                    </div>
+                    
+                    <div class="carousel-text-container">
+                        <h3 id="carousel-title">Renewable Energy Solutions</h3>
+                        <p id="carousel-content">Leading the way in sustainable power generation with cutting-edge magnetic components for wind and solar energy systems.</p>
+                    </div>
+                </div>
+                
+                <button class="carousel-btn prev-btn" id="prev-btn">‹</button>
+                <button class="carousel-btn next-btn" id="next-btn">›</button>
+            </div>
+            
+            <div class="carousel-dots" id="carousel-dots">
+                <button class="dot active" data-index="0"></button>
+                <button class="dot" data-index="1"></button>
+                <button class="dot" data-index="2"></button>
+                <button class="dot" data-index="3"></button>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <p>&copy; 2025 M.A.M.Inc. All rights reserved.</p>
+            </div>
+        </footer>
+
+        <button 
+            class="back-to-top" 
+            id="back-to-top"
+            aria-label="Back to top"
+        >
+            ↑
+        </button>
+    </div>
+
+    <script>
+        // State variables
+        let showProductsDropdown = false;
+        let showBackToTop = false;
+        let currentImageIndex = 0;
+        let visibleObjectives = [];
+
+        // Carousel images data
+        const carouselImages = [
+            { 
+                src: "images/windmill.jpg", 
+                alt: "Renewable Energy", 
+                title: "Renewable Energy Solutions",
+                content: "Leading the way in sustainable power generation with cutting-edge magnetic components for wind and solar energy systems."
+            },
+            { 
+                src: "images/circuits.jpg", 
+                alt: "Circuit Design", 
+                title: "Advanced Circuit Design",
+                content: "Innovative electronic solutions tailored to meet complex power management and signal processing requirements."
+            },
+            { 
+                src: "images/energy_management.jpg", 
+                alt: "Energy Management", 
+                title: "Smart Energy Management",
+                content: "Intelligent systems for optimal energy distribution and efficiency in industrial and commercial applications."
+            },
+            { 
+                src: "images/electronics.jpg", 
+                alt: "Electronics", 
+                title: "Power Electronics",
+                content: "High-performance electronic components designed for demanding industrial and automotive applications."
+            }
+        ];
+
+        // Business objectives data
+        const businessObjectives = [
+            {
+                icon: "images/team-icon.png",
+                content: "Operate as an extension to our client's magnetic component design team"
+            },
+            {
+                icon: "images/frequency-icon.png",
+                content: "Focus on challenging opportunities in high-frequency power magnetic markets"
+            },
+            {
+                icon: "images/market-icon.png",
+                content: "Explore magnetic component opportunities in renewable energy, locomotive, and industrial markets"
+            }
+        ];
+
+        // DOM elements
+        const backToTopBtn = document.getElementById('back-to-top');
+        const homeLink = document.getElementById('home-link');
+        const productsDropdown = document.getElementById('products-dropdown');
+        const dropdownMenu = document.getElementById('dropdown-menu');
+        const carouselImage = document.getElementById('carousel-image');
+        const carouselTitle = document.getElementById('carousel-title');
+        const carouselContent = document.getElementById('carousel-content');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const carouselDots = document.getElementById('carousel-dots');
+
+        // Scroll event handler
+        function handleScroll() {
+            if (window.pageYOffset > 300) {
+                backToTopBtn.style.display = 'block';
+            } else {
+                backToTopBtn.style.display = 'none';
+            }
+        }
+
+        // Scroll to top function
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // Carousel functions
+        function updateCarousel() {
+            const currentImage = carouselImages[currentImageIndex];
+            carouselImage.src = currentImage.src;
+            carouselImage.alt = currentImage.alt;
+            carouselTitle.textContent = currentImage.title;
+            carouselContent.textContent = currentImage.content;
+
+            // Update dots
+            const dots = carouselDots.querySelectorAll('.dot');
+            dots.forEach((dot, index) => {
+                if (index === currentImageIndex) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+        }
+
+        function nextImage() {
+            currentImageIndex = currentImageIndex === carouselImages.length - 1 ? 0 : currentImageIndex + 1;
+            updateCarousel();
+        }
+
+        function prevImage() {
+            currentImageIndex = currentImageIndex === 0 ? carouselImages.length - 1 : currentImageIndex - 1;
+            updateCarousel();
+        }
+
+        function goToImage(index) {
+            currentImageIndex = index;
+            updateCarousel();
+        }
+
+        // Intersection Observer for objectives animation
+        function setupObjectivesAnimation() {
+            const observer = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            // Start animating objectives one by one
+                            const objectiveItems = document.querySelectorAll('.objective-item');
+                            objectiveItems.forEach((item, index) => {
+                                setTimeout(() => {
+                                    item.classList.add('visible');
+                                }, index * 500); // 500ms delay between each objective
+                            });
+                        }
+                    });
+                },
+                { threshold: 0.3 }
+            );
+
+            const objectivesSection = document.querySelector('.business-objectives-section');
+            if (objectivesSection) {
+                observer.observe(objectivesSection);
+            }
+        }
+
+        // Event listeners
+        window.addEventListener('scroll', handleScroll);
+        
+        backToTopBtn.addEventListener('click', scrollToTop);
+        homeLink.addEventListener('click', scrollToTop);
+
+        // Products dropdown
+        productsDropdown.addEventListener('mouseenter', () => {
+            dropdownMenu.classList.add('show');
+        });
+
+        productsDropdown.addEventListener('mouseleave', () => {
+            dropdownMenu.classList.remove('show');
+        });
+
+        // Carousel controls
+        prevBtn.addEventListener('click', prevImage);
+        nextBtn.addEventListener('click', nextImage);
+
+        // Carousel dots
+        carouselDots.addEventListener('click', (e) => {
+            if (e.target.classList.contains('dot')) {
+                const index = parseInt(e.target.getAttribute('data-index'));
+                goToImage(index);
+            }
+        });
+
+        // Initialize everything when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            setupObjectivesAnimation();
+            updateCarousel();
+        });
+    </script>
+</body>
+</html>
