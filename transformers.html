@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transformers - M.A.M.Inc</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="App">
+        <header class="header">
+            <nav class="nav">
+                <div class="nav-left">
+                    <a href="index.html" id="home-link">
+                        <img src="images/logo.jpg" alt="M.A.M.Inc Logo" class="logo" />
+                    </a>
+                </div>
+                <div class="nav-right">
+                    <a href="index.html#about" class="nav-item">About</a>
+
+                    <div class="dropdown nav-item" id="products-dropdown">
+                        <a href="index.html#products" class="dropdown-toggle" style="color: #1a7db8;">
+                            Products ▼
+                        </a>
+                        <div class="dropdown-menu" id="dropdown-menu">
+                            <a href="transformers.html">Transformers</a>
+                            <a href="chokers.html">Chokers</a>
+                            <a href="filters.html">Filters</a>
+                            <a href="additive-magnetics.html">Additive Magnetics</a>
+                        </div>
+                    </div>
+
+                    <a href="index.html#sbir-doe" class="nav-item">Project</a>
+                    <a href="enquiry.html" class="nav-item">Enquiry</a>
+                    <a href="index.html#contact" class="nav-item">Contact Us</a>
+                </div>
+            </nav>
+        </header>
+
+        <section class="product-page-section">
+            <div class="product-page-container">
+                <a href="index.html#products" class="back-link">Back to Products</a>
+
+                <div class="product-page-header">
+                    <h1>Transformers</h1>
+                    <p>High-performance transformer solutions designed for demanding industrial applications. Our transformers are engineered for efficiency, reliability, and optimal thermal management across a wide range of power levels and frequencies.</p>
+                </div>
+
+                <div class="product-types-grid">
+                    <div class="product-type-card">
+                        <div class="product-type-model" id="model-container-1">
+                            <canvas class="model-canvas" id="model-canvas-1"></canvas>
+                            <div class="model-loading" id="model-loading-1">Loading 3D Model...</div>
+                        </div>
+                        <div class="product-type-content">
+                            <h3>Liquid Cooled Magnetics</h3>
+                            <p>Advanced liquid cooling technology enables superior thermal management for high-power applications. Ideal for demanding environments where air cooling is insufficient.</p>
+                        </div>
+                    </div>
+
+                    <div class="product-type-card">
+                        <div class="product-type-model" id="model-container-2">
+                            <canvas class="model-canvas" id="model-canvas-2"></canvas>
+                            <div class="model-loading" id="model-loading-2">Loading 3D Model...</div>
+                        </div>
+                        <div class="product-type-content">
+                            <h3>Medium/High Frequency Transformers</h3>
+                            <p>Optimized core designs for medium to high frequency operation, delivering exceptional efficiency and compact form factors for modern power conversion systems.</p>
+                        </div>
+                    </div>
+
+                    <div class="product-type-card">
+                        <div class="product-type-model" id="model-container-3">
+                            <canvas class="model-canvas" id="model-canvas-3"></canvas>
+                            <div class="model-loading" id="model-loading-3">Loading 3D Model...</div>
+                        </div>
+                        <div class="product-type-content">
+                            <h3>High Current Transformers</h3>
+                            <p>Engineered to handle extreme current levels with minimal losses. Featuring robust construction and advanced winding techniques for reliable high-power operation.</p>
+                        </div>
+                    </div>
+
+                    <div class="product-type-card">
+                        <div class="product-type-model" id="model-container-4">
+                            <canvas class="model-canvas" id="model-canvas-4"></canvas>
+                            <div class="model-loading" id="model-loading-4">Loading 3D Model...</div>
+                        </div>
+                        <div class="product-type-content">
+                            <h3>Control Transformers</h3>
+                            <p>Precision control transformers for instrumentation and control circuits. Designed for accurate voltage transformation and isolation in sensitive applications.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <p>&copy; 2025 M.A.M.Inc. All rights reserved.</p>
+            </div>
+        </footer>
+
+        <button class="back-to-top" id="back-to-top" aria-label="Back to top">↑</button>
+    </div>
+
+    <script>
+        // Product type models - Update paths when you have actual .glb files
+        const productModels = [
+            { containerId: 'model-container-1', canvasId: 'model-canvas-1', loadingId: 'model-loading-1', modelPath: 'images/transformers/liquid-cooled.glb' },
+            { containerId: 'model-container-2', canvasId: 'model-canvas-2', loadingId: 'model-loading-2', modelPath: 'images/transformers/high-frequency.glb' },
+            { containerId: 'model-container-3', canvasId: 'model-canvas-3', loadingId: 'model-loading-3', modelPath: 'images/transformers/high-current.glb' },
+            { containerId: 'model-container-4', canvasId: 'model-canvas-4', loadingId: 'model-loading-4', modelPath: 'images/transformers/control.glb' }
+        ];
+
+        // Store scene data for each model
+        const scenes = [];
+
+        // Initialize Three.js for each product type
+        function initProductModel(config, index) {
+            const container = document.getElementById(config.containerId);
+            const canvas = document.getElementById(config.canvasId);
+            const loading = document.getElementById(config.loadingId);
+
+            // Scene setup
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x1a1a2e);
+
+            // Camera setup
+            const aspect = container.clientWidth / container.clientHeight;
+            const camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 1000);
+            camera.position.set(0, 1, 5);
+
+            // Renderer setup
+            const renderer = new THREE.WebGLRenderer({
+                canvas: canvas,
+                antialias: true,
+                alpha: false
+            });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.shadowMap.enabled = true;
+
+            // Lights
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.9);
+            directionalLight.position.set(5, 5, 5);
+            directionalLight.castShadow = true;
+            scene.add(directionalLight);
+
+            const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.5);
+            directionalLight2.position.set(-5, -3, -5);
+            scene.add(directionalLight2);
+
+            // Controls
+            const controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.enableZoom = true;
+            controls.autoRotate = true;
+            controls.autoRotateSpeed = 1.5;
+            controls.target.set(0, 0, 0);
+
+            // Store scene data
+            scenes[index] = { scene, camera, renderer, controls, container };
+
+            // Load model
+            const loader = new THREE.GLTFLoader();
+            loader.load(
+                config.modelPath,
+                function(gltf) {
+                    const model = gltf.scene;
+
+                    // Auto-fit model
+                    const box = new THREE.Box3().setFromObject(model);
+                    const center = box.getCenter(new THREE.Vector3());
+                    const size = box.getSize(new THREE.Vector3());
+
+                    model.position.x = -center.x;
+                    model.position.y = -center.y;
+                    model.position.z = -center.z;
+
+                    const maxDim = Math.max(size.x, size.y, size.z);
+                    const targetSize = 3;
+                    const scaleFactor = targetSize / maxDim;
+                    model.scale.set(scaleFactor, scaleFactor, scaleFactor);
+
+                    scene.add(model);
+                    loading.style.display = 'none';
+
+                    model.traverse(function(child) {
+                        if (child.isMesh) {
+                            child.castShadow = true;
+                            child.receiveShadow = true;
+                        }
+                    });
+                },
+                function(xhr) {
+                    if (xhr.total > 0) {
+                        const percent = Math.round((xhr.loaded / xhr.total) * 100);
+                        loading.textContent = 'Loading... ' + percent + '%';
+                    }
+                },
+                function(error) {
+                    console.log('Model not found, showing placeholder');
+                    loading.textContent = '3D Model Coming Soon';
+                    loading.style.color = '#aaa';
+
+                    // Create placeholder geometry
+                    const geometry = new THREE.BoxGeometry(2, 1.5, 1.5);
+                    const material = new THREE.MeshStandardMaterial({
+                        color: 0x667eea,
+                        metalness: 0.3,
+                        roughness: 0.7
+                    });
+                    const placeholder = new THREE.Mesh(geometry, material);
+                    scene.add(placeholder);
+                }
+            );
+
+            // Animation loop
+            function animate() {
+                requestAnimationFrame(animate);
+                controls.update();
+                renderer.render(scene, camera);
+            }
+            animate();
+        }
+
+        // Handle window resize
+        function handleResize() {
+            scenes.forEach((sceneData, index) => {
+                if (sceneData) {
+                    const { camera, renderer, container } = sceneData;
+                    const width = container.clientWidth;
+                    const height = container.clientHeight;
+                    camera.aspect = width / height;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(width, height);
+                }
+            });
+        }
+
+        // DOM elements
+        const backToTopBtn = document.getElementById('back-to-top');
+        const productsDropdown = document.getElementById('products-dropdown');
+        const dropdownMenu = document.getElementById('dropdown-menu');
+
+        // Scroll handler
+        function handleScroll() {
+            if (window.pageYOffset > 300) {
+                backToTopBtn.style.display = 'block';
+            } else {
+                backToTopBtn.style.display = 'none';
+            }
+        }
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Event listeners
+        window.addEventListener('scroll', handleScroll);
+        window.addEventListener('resize', handleResize);
+        backToTopBtn.addEventListener('click', scrollToTop);
+
+        productsDropdown.addEventListener('mouseenter', () => {
+            dropdownMenu.classList.add('show');
+        });
+        productsDropdown.addEventListener('mouseleave', () => {
+            dropdownMenu.classList.remove('show');
+        });
+
+        // Initialize on DOM loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            productModels.forEach((config, index) => {
+                initProductModel(config, index);
+            });
+        });
+    </script>
+</body>
+</html>
