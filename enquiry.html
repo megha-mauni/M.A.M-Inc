@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Enquiry - M.A.M.Inc</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* Enquiry page specific styles */
+        .enquiry-page-section {
+            padding: 4rem 0;
+            background-color: #f8f9fa;
+            min-height: calc(100vh - 200px);
+            margin-top: 80px;
+        }
+    </style>
+</head>
+<body>
+    <div class="App">
+        <header class="header">
+            <nav class="nav">
+                <div class="nav-left">
+                    <a href="index.html" id="home-link">
+                        <img src="images/logo.jpg" alt="M.A.M.Inc Logo" class="logo" />
+                    </a>
+                </div>
+                <div class="nav-right">
+                    <a href="index.html#about" class="nav-item">About</a>
+
+                    <div class="dropdown nav-item" id="products-dropdown">
+                        <a href="index.html#products" class="dropdown-toggle">
+                            Products ▼
+                        </a>
+                        <div class="dropdown-menu" id="dropdown-menu">
+                            <a href="index.html#transformers">Transformers</a>
+                            <a href="index.html#chokers">Chokers</a>
+                            <a href="index.html#filters">Filters</a>
+                            <a href="index.html#abc">ABC</a>
+                        </div>
+                    </div>
+
+                    <a href="index.html#sbir-doe" class="nav-item">Project</a>
+                    <a href="enquiry.html" class="nav-item" style="color: #1a7db8;">Enquiry</a>
+                    <a href="index.html#contact" class="nav-item">Contact Us</a>
+                </div>
+            </nav>
+        </header>
+
+        <!-- Enquiry Section -->
+        <section class="enquiry-page-section" id="enquiry">
+            <div class="enquiry-container">
+                <h2>Product Enquiry</h2>
+                <p class="subtitle">Tell us your requirements and we'll recommend the best products for your needs</p>
+
+                <form class="enquiry-form" id="enquiry-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="application">Application Type *</label>
+                            <select id="application" required>
+                                <option value="">Select Application</option>
+                                <option value="renewable">Renewable Energy</option>
+                                <option value="industrial">Industrial</option>
+                                <option value="locomotive">Locomotive</option>
+                                <option value="automotive">Automotive</option>
+                                <option value="aerospace">Aerospace</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="product-category">Product Category *</label>
+                            <select id="product-category" required>
+                                <option value="">Select Category</option>
+                                <option value="transformers">Transformers</option>
+                                <option value="chokers">Chokers</option>
+                                <option value="filters">Filters</option>
+                                <option value="abc">ABC</option>
+                                <option value="custom">Custom Solution</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="frequency">Operating Frequency</label>
+                            <select id="frequency">
+                                <option value="">Select Frequency Range</option>
+                                <option value="low">Low Frequency (&lt; 10kHz)</option>
+                                <option value="medium">Medium Frequency (10kHz - 100kHz)</option>
+                                <option value="high">High Frequency (100kHz - 1MHz)</option>
+                                <option value="very-high">Very High Frequency (&gt; 1MHz)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="power-rating">Power Rating</label>
+                            <select id="power-rating">
+                                <option value="">Select Power Range</option>
+                                <option value="low">Low Power (&lt; 100W)</option>
+                                <option value="medium">Medium Power (100W - 1kW)</option>
+                                <option value="high">High Power (1kW - 10kW)</option>
+                                <option value="very-high">Very High Power (&gt; 10kW)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="voltage">Input/Output Voltage</label>
+                            <input type="text" id="voltage" placeholder="e.g., 240V AC / 48V DC">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="temperature">Operating Temperature Range</label>
+                            <select id="temperature">
+                                <option value="">Select Temperature Range</option>
+                                <option value="standard">Standard (-20°C to +70°C)</option>
+                                <option value="extended">Extended (-40°C to +85°C)</option>
+                                <option value="extreme">Extreme (-55°C to +125°C)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="additional-specs">Additional Requirements</label>
+                        <textarea id="additional-specs" placeholder="Please provide any additional specifications, size constraints, or special requirements..."></textarea>
+                    </div>
+
+                    <button type="submit" class="submit-btn">Get Recommendations</button>
+
+                    <div class="recommendation-result" id="recommendation-result">
+                        <h3>Recommended Products</h3>
+                        <ul class="recommendation-list" id="recommendation-list"></ul>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <p>&copy; 2025 M.A.M.Inc. All rights reserved.</p>
+            </div>
+        </footer>
+
+        <button
+            class="back-to-top"
+            id="back-to-top"
+            aria-label="Back to top"
+        >
+            ↑
+        </button>
+    </div>
+
+    <script>
+        // Product database for recommendations
+        const productDatabase = {
+            transformers: [
+                {
+                    name: "High-Frequency Planar Transformer",
+                    applications: ["renewable", "industrial", "automotive"],
+                    frequency: ["high", "very-high"],
+                    power: ["medium", "high"],
+                    description: "Ideal for high-frequency switching applications with compact design and superior thermal performance."
+                },
+                {
+                    name: "Isolation Transformer",
+                    applications: ["industrial", "locomotive", "aerospace"],
+                    frequency: ["low", "medium"],
+                    power: ["high", "very-high"],
+                    description: "Provides electrical isolation with high power handling capability for industrial applications."
+                },
+                {
+                    name: "Power Transformer",
+                    applications: ["renewable", "industrial"],
+                    frequency: ["low", "medium"],
+                    power: ["very-high"],
+                    description: "Heavy-duty transformer designed for renewable energy systems and industrial power distribution."
+                }
+            ],
+            chokers: [
+                {
+                    name: "Common Mode Choke",
+                    applications: ["industrial", "automotive", "renewable"],
+                    frequency: ["medium", "high"],
+                    power: ["low", "medium"],
+                    description: "Reduces electromagnetic interference in power lines and signal circuits."
+                },
+                {
+                    name: "High-Current Choke",
+                    applications: ["renewable", "industrial"],
+                    frequency: ["low", "medium"],
+                    power: ["high", "very-high"],
+                    description: "Handles high current loads with low core losses for power conversion applications."
+                }
+            ],
+            filters: [
+                {
+                    name: "EMI Filter",
+                    applications: ["automotive", "industrial", "aerospace"],
+                    frequency: ["high", "very-high"],
+                    power: ["low", "medium"],
+                    description: "Suppresses electromagnetic interference in sensitive electronic equipment."
+                },
+                {
+                    name: "LC Power Filter",
+                    applications: ["renewable", "industrial", "locomotive"],
+                    frequency: ["low", "medium"],
+                    power: ["medium", "high"],
+                    description: "Provides clean power output with minimal ripple for critical applications."
+                }
+            ],
+            abc: [
+                {
+                    name: "Custom Magnetic Solution",
+                    applications: ["renewable", "industrial", "locomotive", "automotive", "aerospace", "other"],
+                    frequency: ["low", "medium", "high", "very-high"],
+                    power: ["low", "medium", "high", "very-high"],
+                    description: "Tailored magnetic component designed to meet your specific requirements."
+                }
+            ],
+            custom: [
+                {
+                    name: "Engineered Custom Component",
+                    applications: ["renewable", "industrial", "locomotive", "automotive", "aerospace", "other"],
+                    frequency: ["low", "medium", "high", "very-high"],
+                    power: ["low", "medium", "high", "very-high"],
+                    description: "Fully customized magnetic component engineered from scratch for unique applications."
+                }
+            ]
+        };
+
+        // DOM elements
+        const backToTopBtn = document.getElementById('back-to-top');
+        const productsDropdown = document.getElementById('products-dropdown');
+        const dropdownMenu = document.getElementById('dropdown-menu');
+
+        // Scroll event handler
+        function handleScroll() {
+            if (window.pageYOffset > 300) {
+                backToTopBtn.style.display = 'block';
+            } else {
+                backToTopBtn.style.display = 'none';
+            }
+        }
+
+        // Scroll to top function
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // Enquiry form handling
+        function handleEnquirySubmit(event) {
+            event.preventDefault();
+
+            // Get form values
+            const application = document.getElementById('application').value;
+            const category = document.getElementById('product-category').value;
+            const frequency = document.getElementById('frequency').value;
+            const power = document.getElementById('power-rating').value;
+            const voltage = document.getElementById('voltage').value;
+            const temperature = document.getElementById('temperature').value;
+            const additionalSpecs = document.getElementById('additional-specs').value;
+
+            // Get recommendations
+            const recommendations = getRecommendations(application, category, frequency, power);
+
+            // Display recommendations
+            displayRecommendations(recommendations, voltage, temperature, additionalSpecs);
+        }
+
+        function getRecommendations(application, category, frequency, power) {
+            let recommendations = [];
+
+            // Get products from selected category
+            const categoryProducts = productDatabase[category] || [];
+
+            // Filter based on criteria
+            categoryProducts.forEach(product => {
+                let score = 0;
+
+                // Check application match
+                if (application && product.applications.includes(application)) {
+                    score += 3;
+                }
+
+                // Check frequency match
+                if (frequency && product.frequency.includes(frequency)) {
+                    score += 2;
+                }
+
+                // Check power match
+                if (power && product.power.includes(power)) {
+                    score += 2;
+                }
+
+                // Add product if it has any matching criteria or if criteria not specified
+                if (score > 0 || (!application && !frequency && !power)) {
+                    recommendations.push({
+                        product: product,
+                        score: score
+                    });
+                }
+            });
+
+            // If no specific matches found, recommend custom solutions
+            if (recommendations.length === 0 && category !== 'custom') {
+                recommendations = productDatabase.custom.map(product => ({
+                    product: product,
+                    score: 1
+                }));
+            }
+
+            // Sort by score (highest first)
+            recommendations.sort((a, b) => b.score - a.score);
+
+            return recommendations.slice(0, 3); // Return top 3
+        }
+
+        function displayRecommendations(recommendations, voltage, temperature, additionalSpecs) {
+            const recommendationResult = document.getElementById('recommendation-result');
+            const recommendationList = document.getElementById('recommendation-list');
+
+            if (recommendations.length === 0) {
+                recommendationList.innerHTML = '<li><p>No specific matches found. Please contact us for a custom solution.</p></li>';
+            } else {
+                recommendationList.innerHTML = recommendations.map((rec, index) => {
+                    const product = rec.product;
+                    let matchInfo = '';
+
+                    if (rec.score >= 5) {
+                        matchInfo = '<span style="color: #28a745; font-weight: bold;">Excellent Match</span>';
+                    } else if (rec.score >= 3) {
+                        matchInfo = '<span style="color: #2098D1; font-weight: bold;">Good Match</span>';
+                    } else {
+                        matchInfo = '<span style="color: #666; font-weight: bold;">Possible Match</span>';
+                    }
+
+                    return `
+                        <li>
+                            <strong>${index + 1}. ${product.name}</strong> - ${matchInfo}
+                            <p>${product.description}</p>
+                            ${voltage ? `<p><strong>Note:</strong> Compatible with specified voltage: ${voltage}</p>` : ''}
+                        </li>
+                    `;
+                }).join('');
+            }
+
+            recommendationResult.classList.add('show');
+
+            // Scroll to results
+            recommendationResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Event listeners
+        window.addEventListener('scroll', handleScroll);
+        backToTopBtn.addEventListener('click', scrollToTop);
+
+        // Products dropdown
+        productsDropdown.addEventListener('mouseenter', () => {
+            dropdownMenu.classList.add('show');
+        });
+
+        productsDropdown.addEventListener('mouseleave', () => {
+            dropdownMenu.classList.remove('show');
+        });
+
+        // Initialize on DOM loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            // Enquiry form event listener
+            const enquiryForm = document.getElementById('enquiry-form');
+            if (enquiryForm) {
+                enquiryForm.addEventListener('submit', handleEnquirySubmit);
+            }
+        });
+    </script>
+</body>
+</html>
