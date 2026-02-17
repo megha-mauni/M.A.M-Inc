@@ -391,7 +391,7 @@ body {
   border-radius: 50%;
   font-size: 24px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.1s ease;
   z-index: 100;
 }
 
@@ -421,7 +421,7 @@ body {
   border: none;
   background-color: #ccc;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.1s ease;
 }
 
 .dot.active {

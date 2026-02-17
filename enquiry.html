@@ -52,7 +52,37 @@
                 <h2>Product Enquiry</h2>
                 <p class="subtitle">Tell us your requirements and we'll recommend the best products for your needs</p>
 
-                <form class="enquiry-form" id="enquiry-form">
+                <form class="enquiry-form" id="enquiry-form" novalidate>
+
+                    <!-- Status banner (hidden by default) -->
+                    <div id="form-status" style="display:none; padding: 1rem 1.25rem; border-radius: 6px; margin-bottom: 1.5rem; font-weight: 500;"></div>
+
+                    <h3 style="margin-bottom: 1.25rem; color: #1a3a5c; font-size: 1.1rem; border-bottom: 2px solid #e9ecef; padding-bottom: 0.5rem;">Contact Information</h3>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="contact-name">Full Name *</label>
+                            <input type="text" id="contact-name" name="contact_name" placeholder="e.g., John Smith" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="contact-email">Email Address *</label>
+                            <input type="email" id="contact-email" name="contact_email" placeholder="e.g., john@company.com" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="contact-phone">Phone Number</label>
+                            <input type="tel" id="contact-phone" name="contact_phone" placeholder="e.g., +1 (555) 000-0000">
+                        </div>
+                        <div class="form-group">
+                            <label for="contact-company">Company / Organisation</label>
+                            <input type="text" id="contact-company" name="contact_company" placeholder="e.g., Acme Corp">
+                        </div>
+                    </div>
+
+                    <h3 style="margin: 1.5rem 0 1.25rem; color: #1a3a5c; font-size: 1.1rem; border-bottom: 2px solid #e9ecef; padding-bottom: 0.5rem;">Technical Requirements</h3>
+
                     <div class="form-row">
                         <div class="form-group">
                             <label for="application">Application Type *</label>
@@ -151,7 +181,19 @@
         </button>
     </div>
 
+    <!-- EmailJS SDK -->
+    <!-- SETUP: Sign up at https://emailjs.com, create a service + template, then replace the values below -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script>
+        // ─── EMAILJS CONFIG ────────────────────────────────────────────────────────
+        // Replace these three values after setting up EmailJS (see DEPLOYMENT.md)
+        const EMAILJS_PUBLIC_KEY  = 'YOUR_PUBLIC_KEY';   // EmailJS → Account → Public Key
+        const EMAILJS_SERVICE_ID  = 'YOUR_SERVICE_ID';   // EmailJS → Email Services → Service ID
+        const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';  // EmailJS → Email Templates → Template ID
+        // ──────────────────────────────────────────────────────────────────────────
+
+        emailjs.init(EMAILJS_PUBLIC_KEY);
+
         // Product database for recommendations
         const productDatabase = {
             transformers: [
@@ -251,24 +293,113 @@
             });
         }
 
-        // Enquiry form handling
+        // ── Helpers ────────────────────────────────────────────────────────────────
+        function showStatus(message, type) {
+            const banner = document.getElementById('form-status');
+            banner.textContent = message;
+            banner.style.display = 'block';
+            if (type === 'success') {
+                banner.style.background = '#d4edda';
+                banner.style.color = '#155724';
+                banner.style.border = '1px solid #c3e6cb';
+            } else if (type === 'error') {
+                banner.style.background = '#f8d7da';
+                banner.style.color = '#721c24';
+                banner.style.border = '1px solid #f5c6cb';
+            } else {
+                banner.style.background = '#d1ecf1';
+                banner.style.color = '#0c5460';
+                banner.style.border = '1px solid #bee5eb';
+            }
+            banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function hideStatus() {
+            document.getElementById('form-status').style.display = 'none';
+        }
+
+        // ── Form submission ─────────────────────────────────────────────────────
         function handleEnquirySubmit(event) {
             event.preventDefault();
+            hideStatus();
 
-            // Get form values
+            // Collect contact fields
+            const name    = document.getElementById('contact-name').value.trim();
+            const email   = document.getElementById('contact-email').value.trim();
+            const phone   = document.getElementById('contact-phone').value.trim();
+            const company = document.getElementById('contact-company').value.trim();
+
+            // Basic validation
+            if (!name) { showStatus('Please enter your full name.', 'error'); return; }
+            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                showStatus('Please enter a valid email address.', 'error');
+                return;
+            }
+
+            // Collect technical fields
             const application = document.getElementById('application').value;
-            const category = document.getElementById('product-category').value;
-            const frequency = document.getElementById('frequency').value;
-            const power = document.getElementById('power-rating').value;
-            const voltage = document.getElementById('voltage').value;
+            const category    = document.getElementById('product-category').value;
+            const frequency   = document.getElementById('frequency').value;
+            const power       = document.getElementById('power-rating').value;
+            const voltage     = document.getElementById('voltage').value.trim();
             const temperature = document.getElementById('temperature').value;
-            const additionalSpecs = document.getElementById('additional-specs').value;
+            const additionalSpecs = document.getElementById('additional-specs').value.trim();
 
-            // Get recommendations
-            const recommendations = getRecommendations(application, category, frequency, power);
+            if (!application) { showStatus('Please select an Application Type.', 'error'); return; }
+            if (!category)    { showStatus('Please select a Product Category.', 'error'); return; }
 
-            // Display recommendations
-            displayRecommendations(recommendations, voltage, temperature, additionalSpecs);
+            // Show sending state
+            const submitBtn = document.querySelector('.submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Sending...';
+            showStatus('Sending your enquiry...', 'info');
+
+            // Build readable labels for the email
+            const appLabels  = { renewable:'Renewable Energy', industrial:'Industrial', locomotive:'Locomotive', automotive:'Automotive', aerospace:'Aerospace', other:'Other' };
+            const catLabels  = { transformers:'Transformers', chokers:'Chokers', filters:'Filters', additive:'Additive Magnetics', custom:'Custom Solution' };
+            const freqLabels = { low:'Low Frequency (< 10kHz)', medium:'Medium Frequency (10–100kHz)', high:'High Frequency (100kHz–1MHz)', 'very-high':'Very High Frequency (> 1MHz)' };
+            const powLabels  = { low:'Low Power (< 100W)', medium:'Medium Power (100W–1kW)', high:'High Power (1kW–10kW)', 'very-high':'Very High Power (> 10kW)' };
+            const tempLabels = { standard:'Standard (−20°C to +70°C)', extended:'Extended (−40°C to +85°C)', extreme:'Extreme (−55°C to +125°C)' };
+
+            // EmailJS template parameters — match these names in your EmailJS template
+            const templateParams = {
+                contact_name:    name,
+                contact_email:   email,
+                contact_phone:   phone   || 'Not provided',
+                contact_company: company || 'Not provided',
+                application:     appLabels[application]  || application,
+                product_category: catLabels[category]    || category,
+                frequency:       freqLabels[frequency]   || 'Not specified',
+                power_rating:    powLabels[power]        || 'Not specified',
+                voltage:         voltage                 || 'Not specified',
+                temperature:     tempLabels[temperature] || 'Not specified',
+                additional_specs: additionalSpecs        || 'None',
+            };
+
+            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
+                .then(() => {
+                    showStatus('Your enquiry has been sent successfully. We will get back to you shortly.', 'success');
+                    submitBtn.textContent = 'Enquiry Sent';
+
+                    // Show product recommendations below
+                    const recommendations = getRecommendations(application, category, frequency, power);
+                    displayRecommendations(recommendations, voltage, temperature, additionalSpecs);
+                })
+                .catch((err) => {
+                    console.error('EmailJS error:', err);
+                    // If EmailJS not configured yet, still show recommendations
+                    if (EMAILJS_PUBLIC_KEY === 'YOUR_PUBLIC_KEY') {
+                        showStatus('EmailJS not configured yet — showing product recommendations only. See DEPLOYMENT.md for setup instructions.', 'info');
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Get Recommendations';
+                        const recommendations = getRecommendations(application, category, frequency, power);
+                        displayRecommendations(recommendations, voltage, temperature, additionalSpecs);
+                    } else {
+                        showStatus('Failed to send enquiry. Please email us directly or try again.', 'error');
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Get Recommendations';
+                    }
+                });
         }
 
         function getRecommendations(application, category, frequency, power) {

@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>M.A.M.Inc - Magnetic Component Solutions</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -79,7 +82,34 @@
                 </div>
             </div>
         </section>
-        
+
+        <!-- Newly Launched Products Section -->
+        <section class="image-carousel-section" id="new-launches">
+            <div class="carousel-section-header">
+                <h2>Our Latest Products</h2>
+                <p>Discover our newest innovations in magnetic component design</p>
+            </div>
+            <div class="carousel-container-split">
+                <div class="carousel-content-wrapper">
+                    <div class="carousel-image-container" id="carousel-model-container">
+                        <canvas class="model-canvas" id="carousel-canvas"></canvas>
+                        <div class="model-loading" id="carousel-loading">Loading 3D Model...</div>
+                    </div>
+                    <div class="carousel-text-container">
+                        <h3 id="carousel-title">High-Frequency Planar Transformer</h3>
+                        <p id="carousel-description">Our latest planar transformer design delivers exceptional performance in compact high-frequency power conversion applications, featuring optimized winding geometry and superior thermal characteristics.</p>
+                    </div>
+                </div>
+                <button class="carousel-btn prev-btn" id="carousel-prev">&#8249;</button>
+                <button class="carousel-btn next-btn" id="carousel-next">&#8250;</button>
+                <div class="carousel-dots" id="carousel-dots">
+                    <button class="dot active" data-index="0"></button>
+                    <button class="dot" data-index="1"></button>
+                    <button class="dot" data-index="2"></button>
+                </div>
+            </div>
+        </section>
+
         <!-- Products Section -->
         <section class="products-section" id="products">
             <div class="products-container">
@@ -197,8 +227,222 @@
             }
         }
 
+        // ---- Newly Launched Products Carousel ----
+        const carouselProducts = [
+            {
+                name: 'High-Frequency Planar Transformer',
+                description: 'Our latest planar transformer design delivers exceptional performance in compact high-frequency power conversion applications, featuring optimized winding geometry and superior thermal characteristics.',
+                modelPath: 'images/new-launches/planar-transformer.glb',
+                placeholderGeometry: 'box'
+            },
+            {
+                name: '3D Printed Inductor Core',
+                description: 'Leveraging additive manufacturing, this inductor core achieves complex geometries impossible with traditional methods — resulting in reduced weight, lower losses, and faster prototyping cycles.',
+                modelPath: 'images/new-launches/printed-inductor.glb',
+                placeholderGeometry: 'dodecahedron'
+            },
+            {
+                name: 'Liquid Cooled Power Reactor',
+                description: 'Advanced liquid cooling technology integrated directly into the reactor design enables continuous high-power operation with superior thermal management and extended component life.',
+                modelPath: 'images/new-launches/liquid-reactor.glb',
+                placeholderGeometry: 'torus'
+            }
+        ];
+
+        let currentSlide = 0;
+        let carouselScene, carouselCamera, carouselRenderer, carouselControls;
+        let currentModel = null;
+        let carouselAutoplay;
+
+        function initCarousel() {
+            const container = document.getElementById('carousel-model-container');
+            const canvas = document.getElementById('carousel-canvas');
+
+            // Scene
+            carouselScene = new THREE.Scene();
+            carouselScene.background = new THREE.Color(0x1a1a2e);
+
+            // Camera
+            const aspect = container.clientWidth / container.clientHeight;
+            carouselCamera = new THREE.PerspectiveCamera(45, aspect, 0.1, 1000);
+            carouselCamera.position.set(0, 1, 5);
+
+            // Renderer
+            carouselRenderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: false });
+            carouselRenderer.setSize(container.clientWidth, container.clientHeight);
+            carouselRenderer.setPixelRatio(window.devicePixelRatio);
+            carouselRenderer.shadowMap.enabled = true;
+
+            // Lights
+            const ambient = new THREE.AmbientLight(0xffffff, 0.7);
+            carouselScene.add(ambient);
+
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.9);
+            dirLight.position.set(5, 5, 5);
+            dirLight.castShadow = true;
+            carouselScene.add(dirLight);
+
+            const dirLight2 = new THREE.DirectionalLight(0xffffff, 0.5);
+            dirLight2.position.set(-5, -3, -5);
+            carouselScene.add(dirLight2);
+
+            // Controls
+            carouselControls = new THREE.OrbitControls(carouselCamera, carouselRenderer.domElement);
+            carouselControls.enableDamping = true;
+            carouselControls.dampingFactor = 0.05;
+            carouselControls.enableZoom = true;
+            carouselControls.autoRotate = true;
+            carouselControls.autoRotateSpeed = 1.5;
+            carouselControls.target.set(0, 0, 0);
+
+            // Load first product
+            loadCarouselModel(0);
+
+            // Animation loop
+            function animate() {
+                requestAnimationFrame(animate);
+                carouselControls.update();
+                carouselRenderer.render(carouselScene, carouselCamera);
+            }
+            animate();
+
+            // Auto-advance carousel
+            startAutoplay();
+
+            // Carousel button events
+            document.getElementById('carousel-prev').addEventListener('click', () => {
+                goToSlide((currentSlide - 1 + carouselProducts.length) % carouselProducts.length);
+                resetAutoplay();
+            });
+            document.getElementById('carousel-next').addEventListener('click', () => {
+                goToSlide((currentSlide + 1) % carouselProducts.length);
+                resetAutoplay();
+            });
+
+            // Dot events
+            document.querySelectorAll('#carousel-dots .dot').forEach(dot => {
+                dot.addEventListener('click', () => {
+                    goToSlide(parseInt(dot.dataset.index));
+                    resetAutoplay();
+                });
+            });
+        }
+
+        function loadCarouselModel(index) {
+            const product = carouselProducts[index];
+            const loading = document.getElementById('carousel-loading');
+            loading.style.display = 'block';
+            loading.textContent = 'Loading 3D Model...';
+            loading.style.color = 'white';
+
+            // Remove previous model
+            if (currentModel) {
+                carouselScene.remove(currentModel);
+                currentModel = null;
+            }
+
+            const loader = new THREE.GLTFLoader();
+            loader.load(
+                product.modelPath,
+                function(gltf) {
+                    const model = gltf.scene;
+                    const box = new THREE.Box3().setFromObject(model);
+                    const center = box.getCenter(new THREE.Vector3());
+                    const size = box.getSize(new THREE.Vector3());
+
+                    model.position.x = -center.x;
+                    model.position.y = -center.y;
+                    model.position.z = -center.z;
+
+                    const maxDim = Math.max(size.x, size.y, size.z);
+                    const scaleFactor = 3 / maxDim;
+                    model.scale.set(scaleFactor, scaleFactor, scaleFactor);
+
+                    carouselScene.add(model);
+                    currentModel = model;
+                    loading.style.display = 'none';
+
+                    model.traverse(function(child) {
+                        if (child.isMesh) {
+                            child.castShadow = true;
+                            child.receiveShadow = true;
+                        }
+                    });
+                },
+                function(xhr) {
+                    if (xhr.total > 0) {
+                        const percent = Math.round((xhr.loaded / xhr.total) * 100);
+                        loading.textContent = 'Loading... ' + percent + '%';
+                    }
+                },
+                function(error) {
+                    loading.textContent = '3D Model Coming Soon';
+                    loading.style.color = '#aaa';
+
+                    // Create placeholder based on product type
+                    let geometry;
+                    if (product.placeholderGeometry === 'dodecahedron') {
+                        geometry = new THREE.DodecahedronGeometry(1.2, 0);
+                    } else if (product.placeholderGeometry === 'torus') {
+                        geometry = new THREE.TorusGeometry(1, 0.4, 16, 32);
+                    } else {
+                        geometry = new THREE.BoxGeometry(2, 1.5, 1.5);
+                    }
+                    const material = new THREE.MeshStandardMaterial({
+                        color: 0x667eea,
+                        metalness: 0.3,
+                        roughness: 0.7
+                    });
+                    const placeholder = new THREE.Mesh(geometry, material);
+                    carouselScene.add(placeholder);
+                    currentModel = placeholder;
+                }
+            );
+        }
+
+        function goToSlide(index) {
+            currentSlide = index;
+            const product = carouselProducts[index];
+
+            // Update text
+            document.getElementById('carousel-title').textContent = product.name;
+            document.getElementById('carousel-description').textContent = product.description;
+
+            // Update dots
+            document.querySelectorAll('#carousel-dots .dot').forEach((dot, i) => {
+                dot.classList.toggle('active', i === index);
+            });
+
+            // Load new model
+            loadCarouselModel(index);
+        }
+
+        function startAutoplay() {
+            carouselAutoplay = setInterval(() => {
+                goToSlide((currentSlide + 1) % carouselProducts.length);
+            }, 5000);
+        }
+
+        function resetAutoplay() {
+            clearInterval(carouselAutoplay);
+            startAutoplay();
+        }
+
+        // Handle resize for carousel
+        function handleCarouselResize() {
+            if (carouselRenderer && carouselCamera) {
+                const container = document.getElementById('carousel-model-container');
+                const width = container.clientWidth;
+                const height = container.clientHeight;
+                carouselCamera.aspect = width / height;
+                carouselCamera.updateProjectionMatrix();
+                carouselRenderer.setSize(width, height);
+            }
+        }
+
         // Event listeners
         window.addEventListener('scroll', handleScroll);
+        window.addEventListener('resize', handleCarouselResize);
         backToTopBtn.addEventListener('click', scrollToTop);
         homeLink.addEventListener('click', scrollToTop);
 
@@ -214,6 +458,7 @@
         // Initialize on DOM loaded
         document.addEventListener('DOMContentLoaded', () => {
             setupObjectivesAnimation();
+            initCarousel();
         });
     </script>
 </body>
